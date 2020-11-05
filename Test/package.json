@@ -1,0 +1,19 @@
+{
+  "name": "Test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "author": "me",
+  "license": "",
+  "dependencies": {
+    "lodash": "^4.17.20",
+    "ts-node": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.164",
+    "@types/node": "^14.14.6"
+  }
+}
