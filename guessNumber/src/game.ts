@@ -10,7 +10,7 @@ export class Game {
   }
 
   public async run(): Promise<void> {
-    if (await this.manage_loss()) return;
+    if (this.manage_loss()) return;
 
     const answer = await this.ask_question();
     switch (this.spaceship(this.chosenNumber, answer)) {
@@ -19,18 +19,18 @@ export class Game {
         return;
       case 1:
         console.log('lower !');
-        await this.manage_remaining_tries();
+        this.manage_remaining_tries();
         await this.run();
         break;
       case -1:
         console.log('higher !');
-        await this.manage_remaining_tries();
+        this.manage_remaining_tries();
         await this.run();
         break;
     }
   }
 
-  private async manage_loss(): Promise<boolean> {
+  private manage_loss(): boolean {
     if (this.remainingTries === 0) {
       console.log('dammit, you lost');
       return true;
@@ -38,7 +38,7 @@ export class Game {
     return false;
   }
 
-  private async manage_remaining_tries() {
+  private manage_remaining_tries() {
     this.remainingTries = this.remainingTries - 1;
   }
 
