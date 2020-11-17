@@ -7,7 +7,6 @@ function getRandomInt(max: number) {
 
 async function main() {
   await introDiscussion();
-  console.log('hello');
   const game = new Game(getRandomInt(100), 10);
   await game.run();
   process.exit();
