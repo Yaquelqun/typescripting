@@ -1,12 +1,5 @@
 import { rl } from './console_interface';
 
-export enum GameStatus {
-  INITIATED,
-  ONGOING,
-  WON,
-  LOST,
-}
-
 export class Game {
   chosenNumber: number;
   remainingTries: number;
