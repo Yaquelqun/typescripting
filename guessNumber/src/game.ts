@@ -1,64 +1,51 @@
 import { rl } from './console_interface';
 
+// Promisified version of rl.question
+function question(text: string): string {
+  return new Promise((resolve) => rl.question(text, resolve));
+}
+
 export class Game {
-  chosenNumber: number;
-  remainingTries: number;
-
-  constructor(number: number, remainingTries: number) {
-    this.chosenNumber = number;
-    this.remainingTries = remainingTries;
+  constructor(
+    private _chosenNumber: number, 
+    private _remainingTries: number
+  ) {}
+  
+  get playerDefeated() {
+    return this._remainingTries === 0;
   }
-
+  
   public async run(): Promise<void> {
-    if (this.manage_loss()) return;
-
-    const answer = await this.ask_question();
-    switch (this.spaceship(this.chosenNumber, answer)) {
-      case 0:
-        this.trigger_win();
-        return;
-      case 1:
-        console.log('lower !');
-        this.manage_remaining_tries();
-        await this.run();
-        break;
-      case -1:
-        console.log('higher !');
-        this.manage_remaining_tries();
-        await this.run();
-        break;
-    }
-  }
-
-  private manage_loss(): boolean {
-    if (this.remainingTries === 0) {
+    if (this.playerDefeated) {
       console.log('dammit, you lost');
-      return true;
+      return;
     }
-    return false;
+    
+    const answer = await this._askQuestion();
+    const result = answer - this._chosenNumber;
+    
+    if (result < 0) {
+      console.log('higher !');
+      this._newTry();
+    } else if (result > 0) {
+      console.log('lower !');
+      this._newTry();
+    } else {
+      this._triggerWin();
+    }
   }
-
-  private manage_remaining_tries() {
-    this.remainingTries = this.remainingTries - 1;
+  
+  private _newTry(): void {
+    this._remainingTries -= 1;
+    this.run();
   }
-
-  private trigger_win() {
+  
+  private _triggerWin(): void {
     console.log('omg you won !');
   }
-
-  private spaceship(a: number, b: number): number {
-    if (a > b) return -1;
-    if (a < b) return 1;
-    if (a === b) return 0;
-
-    return 0;
-  }
-
-  private ask_question(): Promise<number> {
-    return new Promise((resolve) => {
-      rl.question(`Please enter a guess, remaining guesses: ${this.remainingTries}\n`, (answer) => {
-        resolve(parseInt(answer, 10));
-      });
-    });
+  
+  private async _askQuestion(): Promise<number> {
+    const answer = await question(`Please enter a guess, remaining guesses: ${this.remainingTries}\n`);
+    return parseInt(answer, 10);
   }
 }
