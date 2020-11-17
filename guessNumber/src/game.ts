@@ -10,34 +10,46 @@ export enum GameStatus {
 export class Game {
   chosenNumber: number;
   remainingTries: number;
-  status: GameStatus.INITIATED;
 
   constructor(number: number, remainingTries: number) {
     this.chosenNumber = number;
     this.remainingTries = remainingTries;
-    this.status = GameStatus.INITIATED;
   }
 
   public async run(): Promise<void> {
-    console.log('what');
-    const answer = await this.ask_question();
+    if (await this.manage_loss()) return;
 
+    const answer = await this.ask_question();
     switch (this.spaceship(this.chosenNumber, answer)) {
       case 0:
         this.trigger_win();
         return;
       case 1:
         console.log('lower !');
+        await this.manage_remaining_tries();
         await this.run();
         break;
       case -1:
         console.log('higher !');
+        await this.manage_remaining_tries();
         await this.run();
         break;
     }
   }
 
-  trigger_win() {
+  private async manage_loss(): Promise<boolean> {
+    if (this.remainingTries === 0) {
+      console.log('dammit, you lost');
+      return true;
+    }
+    return false;
+  }
+
+  private async manage_remaining_tries() {
+    this.remainingTries = this.remainingTries - 1;
+  }
+
+  private trigger_win() {
     console.log('omg you won !');
   }
 
@@ -51,7 +63,7 @@ export class Game {
 
   private ask_question(): Promise<number> {
     return new Promise((resolve) => {
-      rl.question('Please enter a guess \n', (answer) => {
+      rl.question(`Please enter a guess, remaining guesses: ${this.remainingTries}\n`, (answer) => {
         resolve(parseInt(answer, 10));
       });
     });
